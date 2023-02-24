@@ -1,6 +1,5 @@
 import {validationResult} from 'express-validator/check';
 import Player from '../models/player';
-import { ObjectId } from 'mongodb';
 
 export const createScore = (req: any, res: any, next: any) => {
   const errors = validationResult(req);
@@ -18,10 +17,7 @@ export const createScore = (req: any, res: any, next: any) => {
   });
   return player.save()
   .then(result => {
-    res.status(201).json({
-      message: 'Player details created successfully!',
-      player: result
-    });
+    res.status(201).json( result );
   })
   .catch(err => {
     if (!err.statusCode) {
@@ -39,7 +35,8 @@ export const getAllPlayers = (req: any, res: any, next: any) => {
         error.statusCode = 404;
         throw error;
       }
-      res.status(200).json({ message: 'All players fetched.', players: result });
+      result.sort((a: any, b: any) => parseFloat(b.score) - parseFloat(a.score));
+      res.status(200).json( result );
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -51,14 +48,14 @@ export const getAllPlayers = (req: any, res: any, next: any) => {
 
 export const getScore = (req: any, res: any, next: any) => {
   const id = req.body.id;
-  Player.findOne(id)
+  Player.findOne({_id: id})
     .then(score => {
       if (!score) {
         const error: any = new Error('Could not find player score.');
         error.statusCode = 404;
         throw error;
       }
-      res.status(200).json({ message: 'Score fetched.', player: score });
+      res.status(200).json( score );
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -84,7 +81,7 @@ export const updateScore = (req: any, res: any, next: any) => {
         error.statusCode = 404;
         throw error;
       }
-      res.status(200).json({ message: 'Player fetched.', player: result });
+      res.status(200).json( result );
     })
     .catch(err => {
       if (!err.statusCode) {

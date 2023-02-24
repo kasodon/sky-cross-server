@@ -22,10 +22,7 @@ const createScore = (req, res, next) => {
     });
     return player.save()
         .then(result => {
-        res.status(201).json({
-            message: 'Player details created successfully!',
-            player: result
-        });
+        res.status(201).json(result);
     })
         .catch(err => {
         if (!err.statusCode) {
@@ -43,7 +40,8 @@ const getAllPlayers = (req, res, next) => {
             error.statusCode = 404;
             throw error;
         }
-        res.status(200).json({ message: 'All players fetched.', players: result });
+        result.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
+        res.status(200).json(result);
     })
         .catch(err => {
         if (!err.statusCode) {
@@ -55,14 +53,14 @@ const getAllPlayers = (req, res, next) => {
 exports.getAllPlayers = getAllPlayers;
 const getScore = (req, res, next) => {
     const id = req.body.id;
-    player_1.default.findOne(id)
+    player_1.default.findOne({ _id: id })
         .then(score => {
         if (!score) {
             const error = new Error('Could not find player score.');
             error.statusCode = 404;
             throw error;
         }
-        res.status(200).json({ message: 'Score fetched.', player: score });
+        res.status(200).json(score);
     })
         .catch(err => {
         if (!err.statusCode) {
@@ -87,7 +85,7 @@ const updateScore = (req, res, next) => {
             error.statusCode = 404;
             throw error;
         }
-        res.status(200).json({ message: 'Player fetched.', player: result });
+        res.status(200).json(result);
     })
         .catch(err => {
         if (!err.statusCode) {
